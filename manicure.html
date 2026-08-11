@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento | Ana P Inácio</title>
+    <!-- Vincula o arquivo CSS externo que criaremos a seguir -->
+    <link rel="stylesheet" href="estilo-agenda.css">
+</head>
+<body>
+
+    <!-- SEÇÃO PRINCIPAL (HERO) -->
+    <section class="booking-hero">
+        <div class="booking-container">
+            
+            <!-- Lado Esquerdo: Apresentação e Boas-Vindas -->
+            <div class="booking-intro">
+                <span class="subtitle">Agendamento Online</span>
+                <h1>Unhas Impecáveis e o Cuidado que Você Merece.</h1>
+                <p>Escolha o melhor horário, selecione suas cores favoritas e viva uma experiência única de auto-estima e bem-estar.</p>
+                
+                <div class="benefits-mini">
+                    <div class="item">✨ Materiais 100% esterilizados</div>
+                    <div class="item">☕ Espaço confortável com café</div>
+                </div>
+            </div>
+
+            <!-- Lado Direito: Card de Cadastro (Parte 1 do Agendamento) -->
+            <div class="booking-card">
+                <div class="card-header">
+                    <span class="step-indicator">Passo 1 de 2</span>
+                    <h3>Comece seu agendamento</h3>
+                    <p>Insira seu nome para ver os horários disponíveis.</p>
+                </div>
+
+                <!-- Formulário com apenas o Nome Completo -->
+                <form action="parte2.html" method="GET" class="form-booking">
+                    <div class="form-control">
+                        <label for="nome-cliente">Nome Completo</label>
+                        <input 
+                            type="text" 
+                            id="nome-cliente" 
+                            name="nome" 
+                            placeholder="Digite seu nome e sobrenome" 
+                            required 
+                            autocomplete="name"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-next">
+                        Ver Horários Disponíveis ➔
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+</body>
+</html>

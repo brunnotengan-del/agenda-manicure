@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento Confirmado | Recibo</title>
+    <!-- Reaproveita o mesmo CSS para manter o design premium -->
+    <link rel="stylesheet" href="estilo-agenda.css">
+    <style>
+        .receipt-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 25px;
+            border: 2px dashed #e1d4cf; /* Borda tracejada estilo cupom/recibo */
+            text-align: left;
+        }
+        .receipt-title {
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #c97d60;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e1d4cf;
+            padding-bottom: 10px;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            color: #4a3e39;
+        }
+        .receipt-row strong {
+            color: #1c1512;
+        }
+        .wpp-anchor {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: #25d366; /* Verde oficial do WhatsApp */
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        .wpp-anchor:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body>
+
+    <section class="booking-hero">
+        <div class="booking-container" style="grid-template-columns: 1fr; max-width: 600px;">
+            
+            <!-- Card de Sucesso Principal -->
+            <div class="booking-card" style="text-align: center;">
+                
+                <div class="card-header">
+                    <span class="step-indicator" style="background: #e8f5e9; color: #2e7d32;">Sucesso! 🎉</span>
+                    <h2 style="font-size: 1.8rem; margin-top: 15px; color: #1c1512; line-height: 1.3;">
+                        Pronto, seu horário foi marcado! Agora me mande um print de seu recibo para eu confirmar.
+                    </h2>
+                </div>
+
+                <!-- Estrutura do Recibo Virtual -->
+                <div class="receipt-card" id="print-area">
+                    <div class="receipt-title">🎫 Recibo de Agendamento</div>
+                    
+                    <div class="receipt-row">
+                        <span>Cliente:</span>
+                        <strong id="recibo-nome">Carregando...</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Serviço(s):</span>
+                        <strong id="recibo-servicos">Carregando...</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Data Escolhida:</span>
+                        <strong id="recibo-data">Carregando...</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Horário:</span>
+                        <strong id="recibo-hora">Carregando...</strong>
+                    </div>
+                    <div class="receipt-row" style="margin-top: 15px; border-top: 1px dashed #e1d4cf; padding-top: 15px;">
+                        <span>Status:</span>
+                        <strong style="color: #2e7d32;">Aguardando Print 🕒</strong>
+                    </div>
+                </div>
+
+                <!-- Link/Número do WhatsApp de Apoio embaixo -->
+                <a href="#" id="link-wpp-direto" class="wpp-anchor" target="_blank">
+                    💬 Clique aqui se não abrir o WhatsApp
+                </a>
+
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // 1. Configuração do seu WhatsApp (Mude para o seu número real)
+            const meuNumeroWhatsapp = "5599999999999"; 
+
+            // 2. Resgata as informações armazenadas temporariamente na memória do navegador
+            const nome = localStorage.getItem('nomeUsuario') || "Não informado";
+            const servicos = localStorage.getItem('servicosEscolhidos') || "Não informado";
+            const data = localStorage.getItem('dataEscolhida') || "";
+            const hora = localStorage.getItem('horaEscolhida') || "Não informado";
+
+            // 3. Formata a data para o padrão visual brasileiro (DD/MM/AAAA)
+            let dataFormatada = "Não informado";
+            if(data) {
+                dataFormatada = data.split('-').reverse().join('/');
+            }
+
+            // 4. Injeta os dados dinamicamente nas tags do recibo
+            document.getElementById('recibo-nome').textContent = nome;
+            document.getElementById('recibo-servicos').textContent = servicos;
+            document.getElementById('recibo-data').textContent = dataFormatada;
+            document.getElementById('recibo-hora').textContent = hora;
+
+            // 5. Atualiza o link alternativo de contingência do botão do WhatsApp abaixo do recibo
+            const mensagem = `Olá! Acabei de fazer meu agendamento. Segue o print do recibo para confirmação! ✨`;
+            document.getElementById('link-wpp-direto').href = `https://whatsapp.com{meuNumeroWhatsapp}&text=${encodeURIComponent(mensagem)}`;
+        });
+    </script>
+
+</body>
+</html>

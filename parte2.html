@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolha o Serviço e Horário | Agendamento</title>
+    <link rel="stylesheet" href="estilo-agenda.css">
+    <style>
+        .services-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .service-option {
+            border: 1px solid #e1d4cf;
+            padding: 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .service-option:hover {
+            background-color: #fdf2ee;
+        }
+        .service-option input {
+            accent-color: #c97d60;
+            width: 18px;
+            height: 18px;
+        }
+        .datetime-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .client-welcome {
+            color: #c97d60;
+            font-weight: 600;
+        }
+        select {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e1d4cf;
+            background-color: #fafaf9;
+            font-size: 1rem;
+            color: #2d2522;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        select:focus {
+            outline: none;
+            border-color: #c97d60;
+            box-shadow: 0 0 0 4px rgba(201, 125, 96, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <section class="booking-hero">
+        <div class="booking-container">
+            
+            <div class="booking-intro">
+                <span class="subtitle">Quase lá!</span>
+                <h1>Olá, <span id="nome-exibido" class="client-welcome">Cliente</span>! ✨</h1>
+                <p>Agora selecione os procedimentos que deseja realizar e escolha o melhor dia e horário na nossa agenda disponível.</p>
+                
+                <div class="benefits-mini">
+                    <div class="item">📅 Agendamentos a partir de amanhã</div>
+                    <div class="item">🕒 Sáb: 8h às 11h e 15h às 18h</div>
+                </div>
+            </div>
+
+            <div class="booking-card">
+                <div class="card-header">
+                    <span class="step-indicator">Passo 2 de 2</span>
+                    <h3>Personalize seu Atendimento</h3>
+                    <p>Selecione as opções abaixo para finalizar.</p>
+                </div>
+
+                <form onsubmit="enviarParaWhatsApp(event)" class="form-booking">
+                    
+                    <div class="form-control">
+                        <label>Selecione os Serviços</label>
+                        <div class="services-grid">
+                            <label class="service-option">
+                                <input type="checkbox" name="servico" value="Manicure (Mão)">
+                                <span>Manicure (Mão) - R$ 40,00</span>
+                            </label>
+                            <label class="service-option">
+                                <input type="checkbox" name="servico" value="Pedicure (Pé)">
+                                <span>Pedicure (Pé) - R$ 45,00</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="datetime-group">
+                        <div class="form-control">
+                            <label for="data-agenda">Escolha o Dia</label>
+                            <input type="date" id="data-agenda" required onchange="atualizarHorariosDisponiveis()">
+                        </div>
+                        
+                        <div class="form-control">
+                            <label for="hora-agenda">Horário</label>
+                            <select id="hora-agenda" required disabled>
+                                <option value="">Selecione o dia primeiro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-next">
+                        Confirmar Agendamento ✓
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        const agendamentosExistentes = {
+            '2026-08-11': ['19:00'], 
+            '2026-08-15': ['10:00', '16:00'] 
+        };
+
+        const expedienteSabado = [
+            '08:00', '09:00', '10:00', '11:00', 
+            '15:00', '16:00', '17:00', '18:00'
+        ];
+
+        const expedienteSemana = ['18:00', '19:00', '20:00'];
+
+        // Função auxiliar para obter datas no formato correto AAAA-MM-DD sem erros de fuso
+        function obterDataString(objetoData) {
+            const ano = objetoData.getFullYear();
+            const mes = String(objetoData.getMonth() + 1).padStart(2, '0');
+            const dia = String(objetoData.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const nomeCliente = urlParams.get('nome');
+
+            if (nomeCliente) {
+                document.getElementById('nome-exibido').textContent = nomeCliente;
+                localStorage.setItem('nomeUsuario', nomeCliente);
+            } else {
+                const nomeSalvo = localStorage.getItem('nomeUsuario');
+                if (nomeSalvo) {
+                    document.getElementById('nome-exibido').textContent = nomeSalvo;
+                }
+            }
+
+            // Define o dia de amanhã como o mínimo selecionável no calendário
+            const hoje = new Date();
+            const amanha = new Date();
+            amanha.setDate(hoje.getDate() + 1);
+            
+            document.getElementById('data-agenda').setAttribute('min', obterDataString(amanha));
+        });
+
+        function atualizarHorariosDisponiveis() {
+            const campoData = document.getElementById('data-agenda');
+            const campoHora = document.getElementById('hora-agenda');
+            const dataSelecionada = campoData.value;
+
+            if (!dataSelecionada) {
+                campoHora.disabled = true;
+                campoHora.innerHTML = '<option value="">Selecione o dia primeiro</option>';
+                return;
+            }
+
+            // Tratamento seguro da data selecionada
+            const partes = dataSelecionada.split('-');
+            const dataObjeto = new Date(partes[0], partes[1] - 1, partes[2]);
+            const diaDaSemana = dataObjeto.getDay(); 
+
+            // Validação extra anti-retroativa e anti-hoje
+            const dataHojeStr = obterDataString(new Date());
+            if (dataSelecionada <= dataHojeStr) {
+                alert("Agendamentos precisam ser feitos com pelo menos 1 dia de antecedência! Por favor, escolha a partir de amanhã. 💕");
+                campoData.value = "";
+                campoHora.disabled = true;
+                campoHora.innerHTML = '<option value="">Selecione o dia primeiro</option>';
+                return;
+            }
+
+            // Validação de Domingo
+            if (diaDaSemana === 0) { 
+                alert("Desculpe, não atendemos aos domingos. Por favor, escolha de segunda a sábado! 💕");
+                campoData.value = ""; 
+                campoHora.disabled = true;
+                campoHora.innerHTML = '<option value="">Selecione o dia primeiro</option>';
+                return;
+            }
+
+            // Destrava o seletor de horários
+            campoHora.innerHTML = '';
+            campoHora.disabled = false;
+
+            const expedienteDoDia = (diaDaSemana === 6) ? expedienteSabado : expedienteSemana;
+            const horasOcupadas = agendamentosExistentes[dataSelecionada] || [];
+
+            const opcaoInicial = document.createElement('option');
+            opcaoInicial.value = "";
+            opcaoInicial.textContent = "Escolha um horário";
+            campoHora.appendChild(opcaoInicial);
+
+            expedienteDoDia.forEach(hora => {
+                const opcao = document.createElement('option');
+                opcao.value = hora;
+
+                if (horasOcupadas.includes(hora)) {
+                    opcao.textContent = `${hora} - (Ocupado 🚫)`;
+                    opcao.disabled = true;
+                    opcao.style.color = '#999';
+                } else {
+                    opcao.textContent = `${hora}`;
+                }
+                
+                campoHora.appendChild(opcao);
+            });
+        }
+
+        function enviarParaWhatsApp(event) {
+            event.preventDefault(); 
+
+            const meuNumeroWhatsapp = "5599999999999"; 
+
+            const nome = document.getElementById('nome-exibido').textContent;
+            const data = document.getElementById('data-agenda').value;
+            const hora = document.getElementById('hora-agenda').value;
+            
+            const dataFormatada = data.split('-').reverse().join('/');
+
+            const servicosMarcados = [];
+            const checkboxes = document.querySelectorAll('input[name="servico"]:checked');
+            checkboxes.forEach(box => {
+                servicosMarcados.push(box.value);
+            });
+
+            if (servicosMarcados.length === 0) {
+                alert("Por favor, selecione pelo menos um serviço antes de agendar!");
+                return;
+            }
+
+            if (!hora) {
+                alert("Por favor, escolha um horário válido!");
+                return;
+            }
+
+            localStorage.setItem('servicosEscolhidos', servicosMarcados.join(', '));
+            localStorage.setItem('dataEscolhida', data);
+            localStorage.setItem('horaEscolhida', hora);
+
+            const mensagem = `Olá! Meu nome é ${nome}. Gostaria de agendar os seguintes serviços: ${servicosMarcados.join(', ')}. Data: ${dataFormatada}, Horário: ${hora}.`;
+
+            const whatsappUrl = `https://wa.me/${meuNumeroWhatsapp}?text=${encodeURIComponent(mensagem)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+
+</body>
+</html>
